@@ -95,7 +95,7 @@ The qt5-qtbase-devel contains libraries and header files for qt5-qtbase.
 
 %package mysql
 Summary:          MySQL driver for Qt5's SQL classes
-BuildRequires:    mariadb-connector-c-devel
+BuildRequires:    mysql-devel
 Requires:         %{name} = %{version}-%{release}
 %description mysql
 Qt5-qtbase-mysql provides MySQL driver for Qt5's SQL classes.
