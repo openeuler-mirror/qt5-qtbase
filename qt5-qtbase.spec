@@ -13,7 +13,7 @@
 Name:             qt5-qtbase
 Summary:          Core component of Qt toolkit
 Version:          5.11.1
-Release:          9
+Release:          10
 License:          LGPLv2 with exceptions or GPLv3 with exceptions
 Url:              http://qt-project.org/
 Source0:          https://download.qt.io/official_releases/qt/5.11/%{version}/submodules/qtbase-everywhere-src-%{version}.tar.xz
@@ -22,6 +22,7 @@ Source2:          qconfig-multilib.h
 Source3:          10-qt5-check-opengl2.sh
 Source4:          macros.qt5-qtbase
 
+Patch0000:        0001-Fix-compile-issue-with-gcc-9.patch
 Patch0001:        qtbase-multilib_optflags.patch
 Patch0002:        qtbase-opensource-src-5.3.2-QTBUG-35459.patch
 Patch0003:        tell-the-truth-about-private-api.patch
@@ -401,12 +402,14 @@ fi
 
 
 %changelog
+* Mon May 25 2020 lizhenhua <lizhenhua12@huawei.com> - 5.11.1-10
+- Fix compile issue with gcc 9
+
 * Wed Dec 25 2019 fengbing <fengbing7@huawei.com> - 5.11.1-9
 - Type:cves
 - ID:CVE-2018-15518
 - SUG:restart
 - DESC: fix CVE-2018-15518
-
 
 * Thu Nov 07 2019 yanzhihua <yanzhihua4@huawei.com> - 5.11.1-8
 - Package init
