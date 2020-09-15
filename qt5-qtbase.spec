@@ -13,10 +13,10 @@
 Name:             qt5-qtbase
 Summary:          Core component of Qt toolkit
 Version:          5.11.1
-Release:          9
+Release:          10
 License:          LGPLv2 with exceptions or GPLv3 with exceptions
 Url:              http://qt-project.org/
-Source0:          https://download.qt.io/official_releases/qt/5.11/%{version}/submodules/qtbase-everywhere-src-%{version}.tar.xz
+Source0:          https://download.qt.io/new_archive/qt/5.11/%{version}/submodules/qtbase-everywhere-src-%{version}.tar.xz
 Source1:          qtlogging.ini
 Source2:          qconfig-multilib.h
 Source3:          10-qt5-check-opengl2.sh
@@ -401,12 +401,14 @@ fi
 
 
 %changelog
+* Tue Sep 15 2020 liuweibo <liuweibo10@huawei.com> - 5.11.1-10
+- Fix Source0
+
 * Wed Dec 25 2019 fengbing <fengbing7@huawei.com> - 5.11.1-9
 - Type:cves
 - ID:CVE-2018-15518
 - SUG:restart
 - DESC: fix CVE-2018-15518
-
 
 * Thu Nov 07 2019 yanzhihua <yanzhihua4@huawei.com> - 5.11.1-8
 - Package init
