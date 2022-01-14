@@ -1,0 +1,233 @@
+From bc16340b2eee8b7f7c7a8fd4cf7ba0c288bfc6bc Mon Sep 17 00:00:00 2001
+From: pei-jiankang <peijiankang@kylinos.cn>
+Date: Wed, 10 Nov 2021 22:09:24 +0800
+Subject: [PATCH] modify-kwin_5.18-complier-error
+
+---
+ examples/corelib/serialization/cbordump/main.cpp |  8 ++++----
+ .../src_corelib_serialization_qcborstream.cpp    |  2 +-
+ src/corelib/serialization/qcborcommon.h          |  4 ++--
+ src/corelib/serialization/qcborstreamreader.h    |  6 +++---
+ src/corelib/serialization/qcborstreamwriter.h    |  2 +-
+ src/corelib/serialization/qcborvalue.cpp         |  4 ++--
+ src/corelib/serialization/qcborvalue.h           |  4 ++--
+ .../corelib/kernel/qmetatype/tst_qmetatype.h     |  2 +-
+ .../qcborstreamreader/tst_qcborstreamreader.cpp  |  8 ++++----
+ .../serialization/qcborvalue/tst_qcborvalue.cpp  | 16 ++++++++--------
+ 10 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/examples/corelib/serialization/cbordump/main.cpp b/examples/corelib/serialization/cbordump/main.cpp
+index 222bd436..b43650eb 100644
+--- a/examples/corelib/serialization/cbordump/main.cpp
++++ b/examples/corelib/serialization/cbordump/main.cpp
+@@ -385,10 +385,10 @@ void CborDumper::dumpOne(int nestingLevel)
+ 
+     case QCborStreamReader::SimpleType:
+         switch (reader.toSimpleType()) {
+-        case QCborSimpleType::False:
++        case QCborSimpleType::False_QCb:
+             printf("false");
+             break;
+-        case QCborSimpleType::True:
++        case QCborSimpleType::True_QCb:
+             printf("true");
+             break;
+         case QCborSimpleType::Null:
+@@ -620,10 +620,10 @@ void CborDumper::dumpOneDetailed(int nestingLevel)
+         QCborSimpleType st = reader.toSimpleType();
+         reader.next();
+         switch (st) {
+-        case QCborSimpleType::False:
++        case QCborSimpleType::False_QCb:
+             print("Simple Type", "false");
+             break;
+-        case QCborSimpleType::True:
++        case QCborSimpleType::True_QCb:
+             print("Simple Type", "true");
+             break;
+         case QCborSimpleType::Null:
+diff --git a/src/corelib/doc/snippets/code/src_corelib_serialization_qcborstream.cpp b/src/corelib/doc/snippets/code/src_corelib_serialization_qcborstream.cpp
+index 6ddb5a93..993a0a03 100644
+--- a/src/corelib/doc/snippets/code/src_corelib_serialization_qcborstream.cpp
++++ b/src/corelib/doc/snippets/code/src_corelib_serialization_qcborstream.cpp
+@@ -192,7 +192,7 @@
+ //! [15]
+ 
+ //! [16]
+-   writer.append(b ? QCborSimpleType::True : QCborSimpleType::False);
++   writer.append(b ? QCborSimpleType::True_QCb : QCborSimpleType::False_QCb);
+ //! [16]
+ 
+ //! [17]
+diff --git a/src/corelib/serialization/qcborcommon.h b/src/corelib/serialization/qcborcommon.h
+index bec46399..1d80e076 100644
+--- a/src/corelib/serialization/qcborcommon.h
++++ b/src/corelib/serialization/qcborcommon.h
+@@ -58,8 +58,8 @@
+ QT_BEGIN_NAMESPACE
+ 
+ enum class QCborSimpleType : quint8 {
+-    False = 20,
+-    True = 21,
++    False_QCb = 20,
++    True_QCb = 21,
+     Null = 22,
+     Undefined = 23
+ };
+diff --git a/src/corelib/serialization/qcborstreamreader.h b/src/corelib/serialization/qcborstreamreader.h
+index 6d5feccf..1fd22b79 100644
+--- a/src/corelib/serialization/qcborstreamreader.h
++++ b/src/corelib/serialization/qcborstreamreader.h
+@@ -140,8 +140,8 @@ public:
+     bool isInvalid() const          { return type() == Invalid; }
+ 
+     bool isSimpleType(QCborSimpleType st) const { return isSimpleType() && toSimpleType() == st; }
+-    bool isFalse() const            { return isSimpleType(QCborSimpleType::False); }
+-    bool isTrue() const             { return isSimpleType(QCborSimpleType::True); }
++    bool isFalse() const            { return isSimpleType(QCborSimpleType::False_QCb); }
++    bool isTrue() const             { return isSimpleType(QCborSimpleType::True_QCb); }
+     bool isBool() const             { return isFalse() || isTrue(); }
+     bool isNull() const             { return isSimpleType(QCborSimpleType::Null); }
+     bool isUndefined() const        { return isSimpleType(QCborSimpleType::Undefined); }
+@@ -158,7 +158,7 @@ public:
+     qsizetype currentStringChunkSize() const{ Q_ASSERT(isString() || isByteArray()); return _currentStringChunkSize(); }
+     StringResult<qsizetype> readStringChunk(char *ptr, qsizetype maxlen);
+ 
+-    bool toBool() const                 { Q_ASSERT(isBool()); return value64 - int(QCborSimpleType::False); }
++    bool toBool() const                 { Q_ASSERT(isBool()); return value64 - int(QCborSimpleType::False_QCb); }
+     QCborTag toTag() const              { Q_ASSERT(isTag()); return QCborTag(value64); }
+     quint64 toUnsignedInteger() const   { Q_ASSERT(isUnsignedInteger()); return value64; }
+     QCborNegativeInteger toNegativeInteger() const { Q_ASSERT(isNegativeInteger()); return QCborNegativeInteger(value64 + 1); }
+diff --git a/src/corelib/serialization/qcborstreamwriter.h b/src/corelib/serialization/qcborstreamwriter.h
+index f8c94ceb..befea659 100644
+--- a/src/corelib/serialization/qcborstreamwriter.h
++++ b/src/corelib/serialization/qcborstreamwriter.h
+@@ -93,7 +93,7 @@ public:
+     void appendTextString(const char *utf8, qsizetype len);
+ 
+     // convenience
+-    void append(bool b)     { append(b ? QCborSimpleType::True : QCborSimpleType::False); }
++    void append(bool b)     { append(b ? QCborSimpleType::True_QCb : QCborSimpleType::False_QCb); }
+     void appendNull()       { append(QCborSimpleType::Null); }
+     void appendUndefined()  { append(QCborSimpleType::Undefined); }
+ 
+diff --git a/src/corelib/serialization/qcborvalue.cpp b/src/corelib/serialization/qcborvalue.cpp
+index 89a928d3..465b8d20 100644
+--- a/src/corelib/serialization/qcborvalue.cpp
++++ b/src/corelib/serialization/qcborvalue.cpp
+@@ -3060,9 +3060,9 @@ QDebug operator<<(QDebug dbg, const QCborValue &v)
+ Q_CORE_EXPORT const char *qt_cbor_simpletype_id(QCborSimpleType st)
+ {
+     switch (st) {
+-    case QCborSimpleType::False:
++    case QCborSimpleType::False_QCb:
+         return "False";
+-    case QCborSimpleType::True:
++    case QCborSimpleType::True_QCb:
+         return "True";
+     case QCborSimpleType::Null:
+         return "Null";
+diff --git a/src/corelib/serialization/qcborvalue.h b/src/corelib/serialization/qcborvalue.h
+index aa51e5da..b96d500d 100644
+--- a/src/corelib/serialization/qcborvalue.h
++++ b/src/corelib/serialization/qcborvalue.h
+@@ -117,8 +117,8 @@ public:
+ 
+         // range 0x100 - 0x1ff for Simple Types
+         SimpleType      = 0x100,
+-        False           = SimpleType + int(QCborSimpleType::False),
+-        True            = SimpleType + int(QCborSimpleType::True),
++        False           = SimpleType + int(QCborSimpleType::False_QCb),
++        True            = SimpleType + int(QCborSimpleType::True_QCb),
+         Null            = SimpleType + int(QCborSimpleType::Null),
+         Undefined       = SimpleType + int(QCborSimpleType::Undefined),
+ 
+diff --git a/tests/auto/corelib/kernel/qmetatype/tst_qmetatype.h b/tests/auto/corelib/kernel/qmetatype/tst_qmetatype.h
+index 22bcb69a..4d5bdc1a 100644
+--- a/tests/auto/corelib/kernel/qmetatype/tst_qmetatype.h
++++ b/tests/auto/corelib/kernel/qmetatype/tst_qmetatype.h
+@@ -275,7 +275,7 @@ template<> struct TestValueFactory<QMetaType::QJsonDocument> {
+ };
+ 
+ template<> struct TestValueFactory<QMetaType::QCborSimpleType> {
+-    static QCborSimpleType *create() { return new QCborSimpleType(QCborSimpleType::True); }
++    static QCborSimpleType *create() { return new QCborSimpleType(QCborSimpleType::True_QCb); }
+ };
+ template<> struct TestValueFactory<QMetaType::QCborValue> {
+     static QCborValue *create() { return new QCborValue(123.); }
+diff --git a/tests/auto/corelib/serialization/qcborstreamreader/tst_qcborstreamreader.cpp b/tests/auto/corelib/serialization/qcborstreamreader/tst_qcborstreamreader.cpp
+index f969bb90..a4d75422 100644
+--- a/tests/auto/corelib/serialization/qcborstreamreader/tst_qcborstreamreader.cpp
++++ b/tests/auto/corelib/serialization/qcborstreamreader/tst_qcborstreamreader.cpp
+@@ -454,10 +454,10 @@ static QString parseOne(QCborStreamReader &reader)
+     }
+     case QCborStreamReader::SimpleType:
+         switch (reader.toSimpleType()) {
+-        case QCborSimpleType::False:
++        case QCborSimpleType::False_QCb:
+             result = QStringLiteral("false");
+             break;
+-        case QCborSimpleType::True:
++        case QCborSimpleType::True_QCb:
+             result = QStringLiteral("true");
+             break;
+         case QCborSimpleType::Null:
+@@ -577,10 +577,10 @@ bool parseNonRecursive(QString &result, bool &printingStringChunks, QCborStreamR
+             continue;       // skip the comma
+         case QCborStreamReader::SimpleType:
+             switch (reader.toSimpleType()) {
+-            case QCborSimpleType::False:
++            case QCborSimpleType::False_QCb:
+                 result += QStringLiteral("false");
+                 break;
+-            case QCborSimpleType::True:
++            case QCborSimpleType::True_QCb:
+                 result += QStringLiteral("true");
+                 break;
+             case QCborSimpleType::Null:
+diff --git a/tests/auto/corelib/serialization/qcborvalue/tst_qcborvalue.cpp b/tests/auto/corelib/serialization/qcborvalue/tst_qcborvalue.cpp
+index 0a780d3e..cf3f9df3 100644
+--- a/tests/auto/corelib/serialization/qcborvalue/tst_qcborvalue.cpp
++++ b/tests/auto/corelib/serialization/qcborvalue/tst_qcborvalue.cpp
+@@ -240,12 +240,12 @@ void tst_QCborValue::basics_data()
+     add(QCborValue::Null, QCborValue::Null, st(QCborSimpleType::Null));
+     QTest::newRow("nullptr") << QCborValue::Null << QCborValue(nullptr)
+                              << st(QCborSimpleType::Null);
+-    add(QCborValue::False, false, st(QCborSimpleType::False));
++    add(QCborValue::False, false, st(QCborSimpleType::False_QCb));
+     QTest::newRow("false") << QCborValue::False << QCborValue(QCborValue::False)
+-                           << st(QCborSimpleType::False);
+-    add(QCborValue::True, true, st(QCborSimpleType::True));
++                           << st(QCborSimpleType::False_QCb);
++    add(QCborValue::True, true, st(QCborSimpleType::True_QCb));
+     QTest::newRow("true") << QCborValue::True << QCborValue(QCborValue::True)
+-                          << st(QCborSimpleType::True);
++                          << st(QCborSimpleType::True_QCb);
+     QTest::newRow("simpletype") << QCborValue::Type(QCborValue::SimpleType + 255)
+                                 << QCborValue(QCborSimpleType(255))
+                                 << st(QCborSimpleType(255));
+@@ -297,8 +297,8 @@ static void basicTypeCheck(QCborValue::Type type, const QCborValue &v, const QVa
+     QCOMPARE(v.isInvalid(), type == QCborValue::Invalid);
+     QCOMPARE(v.isContainer(), type == QCborValue::Array || type == QCborValue::Map);
+     QCOMPARE(v.isSimpleType(), isSimpleType);
+-    QCOMPARE(v.isSimpleType(QCborSimpleType::False), st == QCborSimpleType::False);
+-    QCOMPARE(v.isSimpleType(QCborSimpleType::True), st == QCborSimpleType::True);
++    QCOMPARE(v.isSimpleType(QCborSimpleType::False_QCb), st == QCborSimpleType::False_QCb);
++    QCOMPARE(v.isSimpleType(QCborSimpleType::True_QCb), st == QCborSimpleType::True_QCb);
+     QCOMPARE(v.isSimpleType(QCborSimpleType::Null), st == QCborSimpleType::Null);
+     QCOMPARE(v.isSimpleType(QCborSimpleType::Undefined), st == QCborSimpleType::Undefined);
+     QCOMPARE(v.isSimpleType(QCborSimpleType(255)), st == QCborSimpleType(255));
+@@ -310,8 +310,8 @@ static void basicTypeCheck(QCborValue::Type type, const QCborValue &v, const QVa
+         QCOMPARE(v.toInteger(), qint64(expectedValue.toDouble()));
+         QCOMPARE(v.toDouble(), expectedValue.toDouble());
+     }
+-    QCOMPARE(v.toBool(true), st != QCborSimpleType::False);
+-    QCOMPARE(v.toBool(), st == QCborSimpleType::True);
++    QCOMPARE(v.toBool(true), st != QCborSimpleType::False_QCb);
++    QCOMPARE(v.toBool(), st == QCborSimpleType::True_QCb);
+     if (st == QCborSimpleType::Undefined)
+         QCOMPARE(v.toSimpleType(QCborSimpleType::Null), QCborSimpleType::Undefined);
+     else if (isSimpleType)
+-- 
+2.27.0
+
