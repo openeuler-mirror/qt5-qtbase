@@ -13,7 +13,7 @@
 Name:             qt5-qtbase
 Summary:          Core component of Qt toolkit
 Version:          5.11.1
-Release:          12
+Release:          13
 License:          LGPLv2 with exceptions or GPLv3 with exceptions
 Url:              http://qt-project.org/
 Source0:          https://download.qt.io/new_archive/qt/5.11/%{version}/submodules/qtbase-everywhere-src-%{version}.tar.xz
@@ -33,8 +33,9 @@ Patch0008:        qt5-qtbase-cxxflag.patch
 Patch0009:        qt5-qtbase-5.9.1-firebird.patch
 Patch0010:        qtbase-everywhere-src-5.11.1-python3.patch
 Patch0011:        qt5-qtbase-glibc.patch
+Patch0012:        QTBUG-82601-Fix-under-non-integer-scaling-incorrect-update-area.patch
 
-Patch6000:        CVE-2018-15518.patch 
+Patch6000:        CVE-2018-15518.patch
 Patch6001:        CVE-2015-9541.patch
 Patch6002:        CVE-2019-18281.patch
 
@@ -403,6 +404,9 @@ fi
 
 
 %changelog
+* Tue Feb 8 2022 zhaoshuang <zhaoshuang@uniontech.com> - 5.11.1-13
+- add a patch to fix cursor shifting related issue
+
 * Thu Apr 22 2021 wangyue <wangyue92@huawei.com> - 5.11.1-12
 - fix CVE-2019-18281
 
@@ -410,7 +414,7 @@ fi
 - fix CVE-2015-9541
 
 * Fri Sep 18 2020 liuweibo <liuweibo10@huawei.com> - 5.11.1-10
-- Fix Source0 
+- Fix Source0
 
 * Wed Dec 25 2019 fengbing <fengbing7@huawei.com> - 5.11.1-9
 - Type:cves
