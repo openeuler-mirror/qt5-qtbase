@@ -1,0 +1,63 @@
+Index: qtbase-opensource-src/src/gui/kernel/qhighdpiscaling_p.h
+===================================================================
+--- qtbase-opensource-src.orig/src/gui/kernel/qhighdpiscaling_p.h
++++ qtbase-opensource-src/src/gui/kernel/qhighdpiscaling_p.h
+@@ -416,8 +416,10 @@ inline QRegion toNativeLocalRegion(const
+     qreal scaleFactor = QHighDpiScaling::factor(window);
+     QRegion pixelRegon;
+     for (const QRect &rect : pointRegion) {
+-        pixelRegon += QRect(toNative(rect.topLeft(), scaleFactor),
+-                             toNative(rect.size(), scaleFactor));
++        const QPointF topLeftF = rect.topLeft();
++        const QSizeF sizeF = rect.size();
++        pixelRegon += QRectF(toNative(topLeftF, scaleFactor, QPointF(0,0)),
++                             toNative(sizeF, scaleFactor)).toRect();
+     }
+     return pixelRegon;
+ }
+Index: qtbase-opensource-src/src/gui/painting/qpaintengine_raster.cpp
+===================================================================
+--- qtbase-opensource-src.orig/src/gui/painting/qpaintengine_raster.cpp
++++ qtbase-opensource-src/src/gui/painting/qpaintengine_raster.cpp
+@@ -1333,7 +1333,7 @@ void QRasterPaintEngine::clip(const QRec
+         QPaintEngineEx::clip(rect, op);
+         return;
+ 
+-    } else if (!setClipRectInDeviceCoords(s->matrix.mapRect(rect), op)) {
++    } else if (!setClipRectInDeviceCoords(s->matrix.mapRect(QRectF(rect)).toRect(), op)) {
+         QPaintEngineEx::clip(rect, op);
+         return;
+     }
+Index: qtbase-opensource-src/src/gui/painting/qtransform.cpp
+===================================================================
+--- qtbase-opensource-src.orig/src/gui/painting/qtransform.cpp
++++ qtbase-opensource-src/src/gui/painting/qtransform.cpp
+@@ -1518,7 +1518,27 @@ QRegion QTransform::map(const QRegion &r
+     }
+ 
+     if (t == TxScale && r.rectCount() == 1)
+-        return QRegion(mapRect(r.boundingRect()));
++    {
++        QRegion res;
++        if(m11() < 0 || m22() < 0)
++        {
++            for(const QRect& rect : r)
++                res += mapRect(QRectF(rect)).toRect();
++        }
++        else {
++            QVarLengthArray<QRect,32> rects;
++            rects.reserve(r.rectCount());
++            for(const QRect& rect : r)
++            {
++                QRect nr = mapRect(QRectF(rect)).toRect();
++                if(!nr.isEmpty())
++                    rects.append(nr);
++            }
++            res.setRects(rects.constData(),rects.count());
++        }
++        return res;
++    }
++
+ 
+     QPainterPath p = map(qt_regionToPath(r));
+     return p.toFillPolygon(QTransform()).toPolygon();
