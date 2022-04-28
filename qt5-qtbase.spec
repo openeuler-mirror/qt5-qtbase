@@ -34,7 +34,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          1
+Release:          2
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -118,6 +118,7 @@ Patch0015:        qtbase-QTBUG-89977.patch
 Patch0016:        qtbase-filechooser-portal-send-window-id-in-hex.patch
 Patch0017:        qtbase-QTBUG-91909.patch
 Patch0018:        0001-modify-kwin_5.18-complier-error.patch
+Patch0019:        0002-add-loongarch64-architecture-support.patch
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -371,6 +372,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch0015 -p1 -b .QTBUG-89977
 %patch0017 -p1 -b .QTBUG-91909
 %patch0018 -p1
+%patch0019 -p1
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
@@ -979,15 +981,21 @@ fi
 %{_qt5_plugindir}/platforms/libqminimalegl.so
 %dir %{_qt5_plugindir}/egldeviceintegrations/
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-integration.so
-#%%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
-#%%{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
+%ifarch loongarch64
+%{_qt5_plugindir}/egldeviceintegrations/libqeglfs-x11-integration.so
+%{_qt5_plugindir}/xcbglintegrations/libqxcb-egl-integration.so
+%endif
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-kms-egldevice-integration.so
 %{_qt5_plugindir}/egldeviceintegrations/libqeglfs-emu-integration.so
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake
-#%%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%ifarch loongarch64
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake
+%endif
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake
-#%%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
+%ifarch loongarch64
+%{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake
+%endif
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake
 %{_qt5_libdir}/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake
 %endif
@@ -1012,6 +1020,9 @@ fi
 
 
 %changelog
+* Thu Apr 28 2022 Ge Wang <wangge20@h-partner.com> - 5.15.2-2
+- add loongarch64 architecture support
+
 * Sat Dec 11 2021 hua_yadong <huayadong@kylinos.cn> - 5.15.2-1
 - update to upstream version 5.15.2
 
