@@ -1,0 +1,61 @@
+From 030edc4ea8456bf0d656893b5f3854d63bafa82c Mon Sep 17 00:00:00 2001
+From: wang--ge <wang__ge@126.com>
+Date: Wed, 27 Apr 2022 14:50:50 +0800
+Subject: [PATCH] add loongarch64 architecture support
+
+---
+ .../double-conversion/include/double-conversion/utils.h  | 1 +
+ src/corelib/global/archdetect.cpp                        | 4 ++++
+ src/corelib/global/qprocessordetection.h                 | 9 +++++++++
+ 3 files changed, 14 insertions(+)
+
+diff --git a/src/3rdparty/double-conversion/include/double-conversion/utils.h b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+index 70e697c..3684eb1 100644
+--- a/src/3rdparty/double-conversion/include/double-conversion/utils.h
++++ b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
+     defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
+     defined(__riscv) || \
+     defined(__or1k__) || defined(__arc__) || \
++    defined(__loongarch__) || defined(__loongarch64__) || \
+     defined(__EMSCRIPTEN__)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(__mc68000__) || \
+diff --git a/src/corelib/global/archdetect.cpp b/src/corelib/global/archdetect.cpp
+index 1d00b7f..8ca6efe 100644
+--- a/src/corelib/global/archdetect.cpp
++++ b/src/corelib/global/archdetect.cpp
+@@ -59,6 +59,10 @@
+ #  define ARCH_PROCESSOR "x86_64"
+ #elif defined(Q_PROCESSOR_IA64)
+ #  define ARCH_PROCESSOR "ia64"
++#elif defined(Q_PROCESSOR_LOONGARCH_64)
++#  define ARCH_PROCESSOR "loongarch64"
++#elif defined(Q_PROCESSOR_LOONGARCH)
++#  define ARCH_PROCESSOR "loongarch"
+ #elif defined(Q_PROCESSOR_MIPS_64)
+ #  define ARCH_PROCESSOR "mips64"
+ #elif defined(Q_PROCESSOR_MIPS)
+diff --git a/src/corelib/global/qprocessordetection.h b/src/corelib/global/qprocessordetection.h
+index 8d65720..ee4b8ac 100644
+--- a/src/corelib/global/qprocessordetection.h
++++ b/src/corelib/global/qprocessordetection.h
+@@ -223,6 +223,15 @@
+ #  define Q_PROCESSOR_WORDSIZE   8
+ // Q_BYTE_ORDER not defined, use endianness auto-detection
+ 
++/*
++ */
++#elif defined(_loongarch) || defined(__loongarch__)
++#  define Q_PROCESSOR_LOONGARCH
++#  if defined(__loongarch64)
++#    define Q_PROCESSOR_LOONGARCH_64
++#    define Q_PROCESSOR_WORDSIZE 8
++#  endif
++
+ /*
+     MIPS family, known revisions: I, II, III, IV, 32, 64
+ 
+-- 
+2.27.0
+
