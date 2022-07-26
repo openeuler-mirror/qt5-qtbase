@@ -34,7 +34,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          1
+Release:          2
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -118,6 +118,9 @@ Patch0015:        qtbase-QTBUG-89977.patch
 Patch0016:        qtbase-filechooser-portal-send-window-id-in-hex.patch
 Patch0017:        qtbase-QTBUG-91909.patch
 Patch0018:        0001-modify-kwin_5.18-complier-error.patch
+# https://launchpad.net/ubuntu/+source/qtbase-opensource-src/5.15.2+dfsg-15
+Patch0019:        CVE-2021-38593.patch
+Patch0020:        CVE-2022-25255.patch
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -371,6 +374,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch0015 -p1 -b .QTBUG-89977
 %patch0017 -p1 -b .QTBUG-91909
 %patch0018 -p1
+%patch0019 -p1
+%patch0020 -p1
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
@@ -1012,6 +1017,9 @@ fi
 
 
 %changelog
+* Tue Jul 26 2022 wangkai <wangkai385@h-partners.com> - 5.15.2-2
+- Fix CVE-2021-38593 and CVE-2022-25255
+
 * Sat Dec 11 2021 hua_yadong <huayadong@kylinos.cn> - 5.15.2-1
 - update to upstream version 5.15.2
 
