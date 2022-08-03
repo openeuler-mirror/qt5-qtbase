@@ -34,7 +34,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          2
+Release:          3
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -57,9 +57,6 @@ Source3:          10-qt5-check-opengl2.sh
 # macros
 Source4:          macros.qt5-qtbase
 
-# support multilib optflags
-Patch0000:        qtbase-multilib_optflags.patch
-
 # borrowed from opensuse
 # track private api via properly versioned symbols
 # downside: binaries produced with these differently-versioned symbols are no longer
@@ -69,11 +66,6 @@ Patch0001:        tell-the-truth-about-private-api.patch
 # upstreamable patches
 # namespace QT_VERSION_CHECK to workaround major/minor being pre-defined (#1396755)
 Patch0002:        qtbase-opensource-src-5.8.0-QT_VERSION_CHECK.patch
-
-# 1381828 - Broken window scaling for some QT5 applications (#1381828)
-# This patch moves the threshold for 2x scaling from the DPI of 144 to 192,
-# the same value GNOME uses. It's not a complete solution...
-Patch0003:        qtbase-hidpi_scale_at_192.patch
 
 # 1. Workaround moc/multilib issues
 # https://bugzilla.redhat.com/show_bug.cgi?id=1290020
@@ -115,7 +107,6 @@ Patch0013:        %{name}-gcc11.patch
 # see also patch90
 Patch0014:        qtbase-QTBUG-90395.patch
 Patch0015:        qtbase-QTBUG-89977.patch
-Patch0016:        qtbase-filechooser-portal-send-window-id-in-hex.patch
 Patch0017:        qtbase-QTBUG-91909.patch
 Patch0018:        0001-modify-kwin_5.18-complier-error.patch
 # https://launchpad.net/ubuntu/+source/qtbase-opensource-src/5.15.2+dfsg-15
@@ -1017,6 +1008,9 @@ fi
 
 
 %changelog
+* Wed Jul 27 2022 peijiankang <peijiankang@kylinos.cn> - 5.15.2-3
+- remove unnecessary file
+
 * Tue Jul 26 2022 wangkai <wangkai385@h-partners.com> - 5.15.2-2
 - Fix CVE-2021-38593 and CVE-2022-25255
 
