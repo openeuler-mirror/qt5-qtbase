@@ -1,0 +1,141 @@
+From 2d5384cdea1303e20c3c7f69b24703b4a2ad91b0 Mon Sep 17 00:00:00 2001
+From: wuzx <wuzx1226@qq.com>
+Date: Fri, 18 Nov 2022 01:17:49 +0800
+Subject: [PATCH] Add sw64 architecture
+
+Signed-off-by: wuzx <wuzx1226@qq.com>
+---
+ .../include/double-conversion/utils.h         |  2 +-
+ src/3rdparty/sha3/brg_endian.h                |  1 +
+ src/corelib/global/qprocessordetection.h      |  3 +-
+ src/corelib/io/qfilesystemwatcher_inotify.cpp |  4 +++
+ src/gui/image/qimage.cpp                      |  4 +++
+ src/testlib/3rdparty/cycle_p.h                | 36 +++++++++++++++++++
+ 6 files changed, 48 insertions(+), 2 deletions(-)
+
+diff --git a/src/3rdparty/double-conversion/include/double-conversion/utils.h b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+index 70e697ca..1524e931 100644
+--- a/src/3rdparty/double-conversion/include/double-conversion/utils.h
++++ b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
+     defined(__powerpc__) || defined(__ppc__) || defined(__ppc64__) || \
+     defined(_POWER) || defined(_ARCH_PPC) || defined(_ARCH_PPC64) || \
+     defined(__sparc__) || defined(__sparc) || defined(__s390__) || \
+-    defined(__SH4__) || defined(__alpha__) || \
++    defined(__SH4__) || defined(__alpha__) || defined(__sw_64__) || \
+     defined(_MIPS_ARCH_MIPS32R2) || defined(__ARMEB__) ||\
+     defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
+     defined(__riscv) || \
+diff --git a/src/3rdparty/sha3/brg_endian.h b/src/3rdparty/sha3/brg_endian.h
+index 9bb306e6..e3907596 100644
+--- a/src/3rdparty/sha3/brg_endian.h
++++ b/src/3rdparty/sha3/brg_endian.h
+@@ -105,6 +105,7 @@ Changes for ARM 9/9/2010 [Downstream relative to Gladman's GitHub, upstream to Q
+ #if !defined(PLATFORM_BYTE_ORDER)
+ 
+ #if   defined( __alpha__ ) || defined( __alpha ) || defined( i386 )       || \
++#if   defined( __sw_64__ ) || defined( __sw_64 ) || \
+       defined( __i386__ )  || defined( _M_I86 )  || defined( _M_IX86 )    || \
+       defined( __OS2__ )   || defined( sun386 )  || defined( __TURBOC__ ) || \
+       defined( vax )       || defined( vms )     || defined( VMS )        || \
+diff --git a/src/corelib/global/qprocessordetection.h b/src/corelib/global/qprocessordetection.h
+index 8d657208..20c9650d 100644
+--- a/src/corelib/global/qprocessordetection.h
++++ b/src/corelib/global/qprocessordetection.h
+@@ -87,7 +87,8 @@
+ // #elif defined(__alpha__) || defined(_M_ALPHA)
+ // #  define Q_PROCESSOR_ALPHA
+ // Q_BYTE_ORDER not defined, use endianness auto-detection
+-
++//#elif defined(__sw_64__) || defined(_M_SW_64)
++//#  define Q_PROCESSOR_SW_64
+ /*
+     ARM family, known revisions: V5, V6, V7, V8
+ 
+diff --git a/src/corelib/io/qfilesystemwatcher_inotify.cpp b/src/corelib/io/qfilesystemwatcher_inotify.cpp
+index 94d9d06b..38b1e7e4 100644
+--- a/src/corelib/io/qfilesystemwatcher_inotify.cpp
++++ b/src/corelib/io/qfilesystemwatcher_inotify.cpp
+@@ -91,6 +91,10 @@
+ # define __NR_inotify_add_watch 285
+ # define __NR_inotify_rm_watch  286
+ # define __NR_inotify_init1     324
++#elif defined (__sw_64__)
++# define __NR_inotify_init      444
++# define __NR_inotify_add_watch 445
++# define __NR_inotify_rm_watch  446
+ #elif defined (__alpha__)
+ # define __NR_inotify_init      444
+ # define __NR_inotify_add_watch 445
+diff --git a/src/gui/image/qimage.cpp b/src/gui/image/qimage.cpp
+index ced5a505..c1096f45 100644
+--- a/src/gui/image/qimage.cpp
++++ b/src/gui/image/qimage.cpp
+@@ -83,6 +83,10 @@ static inline bool isLocked(QImageData *data)
+     return data != nullptr && data->is_locked;
+ }
+ 
++#if defined(Q_CC_DEC) && defined(__sw_64) && (__DECCXX_VER-0 >= 50190001)
++#pragma message disable narrowptr
++#endif
++
+ #if defined(Q_CC_DEC) && defined(__alpha) && (__DECCXX_VER-0 >= 50190001)
+ #pragma message disable narrowptr
+ #endif
+diff --git a/src/testlib/3rdparty/cycle_p.h b/src/testlib/3rdparty/cycle_p.h
+index 95e741a8..5577b873 100644
+--- a/src/testlib/3rdparty/cycle_p.h
++++ b/src/testlib/3rdparty/cycle_p.h
+@@ -405,6 +405,26 @@ INLINE_ELAPSED(__inline__)
+ 
+ #define HAVE_TICK_COUNTER
+ #endif
++/*----------------------------------------------------------------*/
++#if defined(__GNUC__) && defined(__sw_64__) && !defined(HAVE_TICK_COUNTER)
++/*
++ * The 32-bit cycle counter on sw_64 overflows pretty quickly,
++ * unfortunately.  A 1GHz machine overflows in 4 seconds.
++ */
++typedef unsigned int CycleCounterTicks;
++
++static __inline__ CycleCounterTicks getticks(void)
++{
++     unsigned long cc;
++     __asm__ __volatile__ ("rtc %0" : "=r"(cc));
++     return (cc & 0xFFFFFFFF);
++}
++
++INLINE_ELAPSED(__inline__)
++
++#define HAVE_TICK_COUNTER
++#endif
++
+ /*----------------------------------------------------------------*/
+ #if defined(__GNUC__) && defined(__alpha__) && !defined(HAVE_TICK_COUNTER)
+ /*
+@@ -441,6 +461,22 @@ INLINE_ELAPSED(__inline__)
+ #define HAVE_TICK_COUNTER
+ #endif
+ 
++/*----------------------------------------------------------------*/
++#if (defined(__DECC) || defined(__DECCXX)) && defined(__sw_64) && defined(HAVE_C_ASM_H) && !defined(HAVE_TICK_COUNTER)
++#  include <c_asm.h>
++typedef unsigned int CycleCounterTicks;
++
++static __inline CycleCounterTicks getticks(void)
++{
++     unsigned long cc;
++     cc = asm("rtc %v0");
++     return (cc & 0xFFFFFFFF);
++}
++
++INLINE_ELAPSED(__inline)
++
++#define HAVE_TICK_COUNTER
++#endif
+ /*----------------------------------------------------------------*/
+ #if (defined(__DECC) || defined(__DECCXX)) && defined(__alpha) && defined(HAVE_C_ASM_H) && !defined(HAVE_TICK_COUNTER)
+ #  include <c_asm.h>
+-- 
+2.33.0
+
