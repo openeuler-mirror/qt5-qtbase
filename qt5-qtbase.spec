@@ -34,7 +34,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          5
+Release:          6
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -114,6 +114,8 @@ Patch0019:        CVE-2021-38593.patch
 Patch0020:        CVE-2022-25255.patch
 Patch0021:        qt5-qtbase-Add-sw64-architecture.patch
 Patch0022:        add-loongarch64-support.patch
+# https://download.qt.io/official_releases/qt/5.15/CVE-2023-24607-qtbase-5.15.diff
+Patch0023:        CVE-2023-24607.patch
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -371,6 +373,7 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch0020 -p1
 %patch0021 -p1
 %patch0022 -p1
+%patch0023 -p1
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
@@ -1012,6 +1015,9 @@ fi
 
 
 %changelog
+* Fri Apr 28 2023 douyan <douyan@kylinos.cn> - 5.15.2-6
+- fix CVE-2023-24607
+
 * Mon Dec 12 2022 huajingyun <huajingyun@loongson.cn> - 5.15.2-5
 - add loongarch64 support
 
