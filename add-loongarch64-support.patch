@@ -1,0 +1,40 @@
+diff --git a/src/3rdparty/double-conversion/include/double-conversion/utils.h b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+index 70e697ca..9be294a2 100644
+--- a/src/3rdparty/double-conversion/include/double-conversion/utils.h
++++ b/src/3rdparty/double-conversion/include/double-conversion/utils.h
+@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
+     defined(__AARCH64EL__) || defined(__aarch64__) || defined(__AARCH64EB__) || \
+     defined(__riscv) || \
+     defined(__or1k__) || defined(__arc__) || \
++    defined(__loongarch64) || \
+     defined(__EMSCRIPTEN__)
+ #define DOUBLE_CONVERSION_CORRECT_DOUBLE_OPERATIONS 1
+ #elif defined(__mc68000__) || \
+diff --git a/src/corelib/global/archdetect.cpp b/src/corelib/global/archdetect.cpp
+index 1d00b7f5..74f3c8fc 100644
+--- a/src/corelib/global/archdetect.cpp
++++ b/src/corelib/global/archdetect.cpp
+@@ -59,6 +59,8 @@
+ #  define ARCH_PROCESSOR "x86_64"
+ #elif defined(Q_PROCESSOR_IA64)
+ #  define ARCH_PROCESSOR "ia64"
++#elif defined(Q_PROCESSOR_LOONGARCH_64)
++#  define ARCH_PROCESSOR "loongarch64"
+ #elif defined(Q_PROCESSOR_MIPS_64)
+ #  define ARCH_PROCESSOR "mips64"
+ #elif defined(Q_PROCESSOR_MIPS)
+diff --git a/src/corelib/global/qprocessordetection.h b/src/corelib/global/qprocessordetection.h
+index 8d657208..69f84a15 100644
+--- a/src/corelib/global/qprocessordetection.h
++++ b/src/corelib/global/qprocessordetection.h
+@@ -223,6 +223,10 @@
+ #  define Q_PROCESSOR_WORDSIZE   8
+ // Q_BYTE_ORDER not defined, use endianness auto-detection
+ 
++#elif defined(__loongarch64)
++#    define Q_PROCESSOR_LOONGARCH_64
++#    define Q_PROCESSOR_WORDSIZE 8
++
+ /*
+     MIPS family, known revisions: I, II, III, IV, 32, 64
+ 
