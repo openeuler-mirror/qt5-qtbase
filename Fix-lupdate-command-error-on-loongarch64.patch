@@ -1,0 +1,44 @@
+From 0621699a4b5f9bb74355eb106afb7fe68be6db2a Mon Sep 17 00:00:00 2001
+From: Jingyun Hua <huajingyun@loongson.cn>
+Date: Thu, 8 Jun 2023 06:23:44 +0000
+Subject: [PATCH] Fix lupdate command execution error on loongarch64
+
+Signed-off-by: Jingyun Hua <huajingyun@loongson.cn>
+---
+ src/3rdparty/forkfd/forkfd_linux.c       | 3 ++-
+ src/corelib/global/qprocessordetection.h | 5 +++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/3rdparty/forkfd/forkfd_linux.c b/src/3rdparty/forkfd/forkfd_linux.c
+index ffe0e9a5..b1f5408d 100644
+--- a/src/3rdparty/forkfd/forkfd_linux.c
++++ b/src/3rdparty/forkfd/forkfd_linux.c
+@@ -82,7 +82,8 @@ static int sys_clone(unsigned long cloneflags, int *ptid)
+     return syscall(__NR_clone, cloneflags, child_stack, stack_size, ptid, newtls, ctid);
+ #elif defined(__arc__) || defined(__arm__) || defined(__aarch64__) || defined(__mips__) || \
+     defined(__nds32__) || defined(__hppa__) || defined(__powerpc__) || defined(__i386__) || \
+-    defined(__x86_64__) || defined(__xtensa__) || defined(__alpha__) || defined(__riscv)
++    defined(__x86_64__) || defined(__xtensa__) || defined(__alpha__) || defined(__riscv) || \
++    defined(__loongarch__)
+     /* ctid and newtls are inverted on CONFIG_CLONE_BACKWARDS architectures,
+      * but since both values are 0, there's no harm. */
+     return syscall(__NR_clone, cloneflags, child_stack, ptid, ctid, newtls);
+diff --git a/src/corelib/global/qprocessordetection.h b/src/corelib/global/qprocessordetection.h
+index ca9d4080..6f0bc7e7 100644
+--- a/src/corelib/global/qprocessordetection.h
++++ b/src/corelib/global/qprocessordetection.h
+@@ -225,8 +225,9 @@
+ // Q_BYTE_ORDER not defined, use endianness auto-detection
+ 
+ #elif defined(__loongarch64)
+-#    define Q_PROCESSOR_LOONGARCH_64
+-#    define Q_PROCESSOR_WORDSIZE 8
++#  define Q_PROCESSOR_LOONGARCH_64
++#  define Q_PROCESSOR_WORDSIZE 8
++#  define Q_BYTE_ORDER Q_LITTLE_ENDIAN
+ 
+ /*
+     MIPS family, known revisions: I, II, III, IV, 32, 64
+-- 
+2.33.0
+
