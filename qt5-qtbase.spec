@@ -13,7 +13,7 @@
 Name:             qt5-qtbase
 Summary:          Core component of Qt toolkit
 Version:          5.11.1
-Release:          14
+Release:          15
 License:          LGPLv2 with exceptions or GPLv3 with exceptions
 Url:              http://qt-project.org/
 Source0:          https://download.qt.io/new_archive/qt/5.11/%{version}/submodules/qtbase-everywhere-src-%{version}.tar.xz
@@ -43,6 +43,9 @@ Patch6003:        CVE-2021-38593.patch
 Patch6004:        CVE-2022-25255.patch
 # https://download.qt.io/official_releases/qt/5.15/CVE-2023-24607-qtbase-5.15.diff
 Patch6005:        CVE-2023-24607.patch
+Patch6006:        CVE-2023-32762-pre.patch
+Patch6007:        CVE-2023-32762.patch
+Patch6008:        CVE-2023-32763.patch
 
 BuildRequires:    pkgconfig(libsystemd) cups-devel desktop-file-utils findutils
 BuildRequires:    libjpeg-devel libmng-devel libtiff-devel pkgconfig(alsa)
@@ -409,6 +412,9 @@ fi
 
 
 %changelog
+* Wed Jun 28 2023 yaoxin <yao_xin001@hoperun.com> - 5.11.1-15
+- Fix CVE-2023-32762 and CVE-2023-32763
+
 * Mon May 22 2023 douyan <douyan@kylinos.cn> - 5.11.1-14
 - Fix CVE-2023-24607
 
