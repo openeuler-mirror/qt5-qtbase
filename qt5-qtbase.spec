@@ -34,7 +34,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          6
+Release:          7
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -116,6 +116,8 @@ Patch0021:        qt5-qtbase-Add-sw64-architecture.patch
 Patch0022:        add-loongarch64-support.patch
 # https://download.qt.io/official_releases/qt/5.15/CVE-2023-24607-qtbase-5.15.diff
 Patch0023:        CVE-2023-24607.patch
+Patch0024:        CVE-2023-32762.patch
+Patch0025:        CVE-2023-32763.patch
 # Do not check any files in %%{_qt5_plugindir}/platformthemes/ for requires.
 # Those themes are there for platform integration. If the required libraries are
 # not there, the platform to integrate with isn't either. Then Qt will just
@@ -374,6 +376,8 @@ Qt5 libraries used for drawing widgets and OpenGL items.
 %patch0021 -p1
 %patch0022 -p1
 %patch0023 -p1
+%patch0024 -p1
+%patch0025 -p1
 # move some bundled libs to ensure they're not accidentally used
 pushd src/3rdparty
 mkdir UNUSED
@@ -1015,6 +1019,9 @@ fi
 
 
 %changelog
+* Wed Jun 28 2023 yaoxin <yao_xin001@hoperun.com> - 5.15.2-7
+- Fix CVE-2023-32762 and CVE-2023-32763
+
 * Fri Apr 28 2023 douyan <douyan@kylinos.cn> - 5.15.2-6
 - fix CVE-2023-24607
 
