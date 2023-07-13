@@ -19,6 +19,10 @@
 %global platform linux-clang
 %endif
 
+%if "%toolchain" == "clang"
+%global platform linux-clang
+%endif
+
 %global qt_module qtbase
 
 %global rpm_macros_dir %(d=%{_rpmconfigdir}/macros.d; [ -d $d ] || d=%{_sysconfdir}/rpm; echo $d)
@@ -34,7 +38,7 @@ BuildRequires:    pkgconfig(libsystemd)
 Name:             qt5-qtbase
 Summary:          Qt5 - QtBase components
 Version:          5.15.2
-Release:          6
+Release:          7
 
 
 # See LGPL_EXCEPTIONS.txt, for exception details
@@ -1015,6 +1019,9 @@ fi
 
 
 %changelog
+* Thu Jul 13 2023 yoo <sunyuechi@iscas.ac.cn> - 5.15.2-7
+- fix clang build error
+
 * Fri Apr 28 2023 douyan <douyan@kylinos.cn> - 5.15.2-6
 - fix CVE-2023-24607
 
